@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Вход | Finance App</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    footer {
+      margin-top: 20px;
+      padding: 10px;
+      text-align: center;
+      background: #f0f0f0;
+      border-top: 1px solid #ccc;
+      font-size: 14px;
+      color: #555;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-container">
+    <h2>Finance App</h2>
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Пароль">
+    <button id="loginBtn">Войти</button>
+    <button id="registerBtn">Регистрация</button>
+    <p id="error" class="error"></p>
+  </div>
+
+  <footer>
+    🌟 Сайт создан с заботой: Раджапов Бегдияр
+  </footer>
+
+  <script type="module">
+    // 📌 Подключаем Firebase SDK
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+    import { 
+      getAuth, 
+      createUserWithEmailAndPassword, 
+      signInWithEmailAndPassword 
+    } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+
+    // 🔹 Конфигурация Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyCgN19pCiK1hZeG2ClDMbaNgnL23Z3JrqY",
+      authDomain: "finance-app-8025c.firebaseapp.com",
+      projectId: "finance-app-8025c",
+      storageBucket: "finance-app-8025c.firebasestorage.app",
+      messagingSenderId: "801849005781",
+      appId: "1:801849005781:web:badf68b51e221508cef45c",
+      measurementId: "G-V2T1F9NB3R"
+    };
+
+    // Инициализация
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // Логин
+    document.getElementById("loginBtn").addEventListener("click", async () => {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        window.location.href = "home.html"; // переход в приложение
+      } catch (err) {
+        document.getElementById("error").innerText = err.message;
+      }
+    });
+
+    // Регистрация
+    document.getElementById("registerBtn").addEventListener("click", async () => {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      try {
+        await createUserWithEmailAndPassword(auth, email, password);
+        window.location.href = "home.html"; // переход в приложение
+      } catch (err) {
+        document.getElementById("error").innerText = err.message;
+      }
+    });
+  </script>
+</body>
+</html>

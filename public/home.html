@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Finance App</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    footer {
+      margin-top: 20px;
+      padding: 10px;
+      text-align: center;
+      font-size: 14px;
+      color: #555;
+      border-top: 1px solid #ddd;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <h2>Мои финансы</h2>
+    <button id="logoutBtn">Выйти</button>
+
+    <div class="tabs">
+      <button onclick="showTab('debts')">🤝 Долги</button>
+      <button onclick="showTab('income')">📈 Поступления</button>
+      <button onclick="showTab('expenses')">💰 Расходы</button>
+      <button onclick="showTab('savings')">🏦 Накопления</button>
+    </div>
+
+    <div id="tab-content"></div>
+  </div>
+
+  <!-- 🔹 Футер -->
+  <footer>
+    🌟 Сайт создан с заботой: Раджапов Бегдияр
+  </footer>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-auth.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCgN19pCiK1hZeG2ClDMbaNgnL23Z3JrqY",
+      authDomain: "finance-app-8025c.firebaseapp.com",
+      projectId: "finance-app-8025c",
+      storageBucket: "finance-app-8025c.firebasestorage.app",
+      messagingSenderId: "801849005781",
+      appId: "1:801849005781:web:badf68b51e221508cef45c",
+      measurementId: "G-V2T1F9NB3R"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        window.location.href = "index.html";
+      }
+    });
+
+    document.getElementById("logoutBtn").addEventListener("click", async () => {
+      await signOut(auth);
+      window.location.href = "index.html";
+    });
+
+    window.showTab = function(type) {
+      const container = document.getElementById("tab-content");
+      container.innerHTML = `
+        <h3>${type}</h3>
+        <input id="amount" type="number" placeholder="Сумма">
+        <input id="desc" type="text" placeholder="Описание">
+        <button onclick="addEntry('${type}')">Добавить</button>
+        <a href="${type}.html"><button>Посмотреть все</button></a>
+      `;
+    }
+
+    window.addEntry = async function(type) {
+      const amountInput = document.getElementById("amount");
+      const descInput = document.getElementById("desc");
+
+      const amount = amountInput.value;
+      const desc = descInput.value;
+      if (!amount || !desc) return;
+
+      const user = auth.currentUser;
+      if (!user) return;
+
+      await addDoc(collection(db, "users", user.uid, type), {
+        amount: Number(amount),
+        desc,
+        createdAt: new Date()
+      });
+
+      amountInput.value = "";
+      descInput.value = "";
+
+      const container = document.getElementById("tab-content");
+      const msg = document.createElement("p");
+      msg.textContent = "✅ Запись добавлена!";
+      msg.style.color = "green";
+      msg.style.fontWeight = "bold";
+      container.appendChild(msg);
+
+      setTimeout(() => msg.remove(), 2000);
+    }
+  </script>
+</body>
+</html>
